@@ -2,7 +2,9 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
+const logger = require('../utils/logger');
 
+// Función para descargar imágenes desde EasyBroker
 async function downloadImages(propertyId, downloadFolder = '/Users/diegojonguitud/Desktop/dtools/Fotos/img') {
   try {
     // Crear la carpeta si no existe
@@ -24,13 +26,13 @@ async function downloadImages(propertyId, downloadFolder = '/Users/diegojonguitu
       const imagePath = path.join(downloadFolder, `image_${index}.jpg`);
       const imageResponse = await axios.get(image.url, { responseType: 'arraybuffer' });
       fs.writeFileSync(imagePath, imageResponse.data);
-      console.log(`✅ Imagen descargada: ${imagePath}`);
+      logger.info(`✅ Imagen descargada: ${imagePath}`);
       return imagePath;
     }));
 
     return imagePaths;
   } catch (error) {
-    console.error('❌ Error al descargar imágenes:', error.message);
+    logger.error(`❌ Error al descargar imágenes: ${error.message}`);
   }
 }
 

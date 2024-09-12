@@ -9,7 +9,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Función para subir imágenes a Cloudinary sin transformaciones
+// Función para subir imágenes a Cloudinary y luego devolver las URLs
 const subirImagenesACloudinary = async (imagePaths) => {
   const urls = [];
   const publicIds = [];
@@ -17,17 +17,18 @@ const subirImagenesACloudinary = async (imagePaths) => {
   for (const imagePath of imagePaths) {
     try {
       const result = await cloudinary.uploader.upload(imagePath, {
-        folder: 'easybroker_images',  // Sube las imágenes sin aplicar transformaciones
+        folder: 'easybroker_images'
       });
 
-      logger.success(`Imagen subida con éxito: ${result.secure_url}`);
+      logger.success(`Imagen subida a Cloudinary: ${result.secure_url}`);
       urls.push(result.secure_url);
-      publicIds.push(result.public_id);  // Guardar ID público para eliminar después si es necesario
+      publicIds.push(result.public_id);  // Guardar ID público para eliminar después
     } catch (error) {
       logger.error(`Error al subir la imagen ${imagePath}: ${error.message}`);
     }
   }
 
+  // Devolver las URLs y los publicIds
   return { urls, publicIds };
 };
 
@@ -36,11 +37,14 @@ const eliminarImagenesDeCloudinary = async (publicIds) => {
   for (const publicId of publicIds) {
     try {
       await cloudinary.uploader.destroy(publicId);
-      logger.success(`Imagen eliminada de Cloudinary: ${publicId}`);
+      logger.success(`Imagen con public_id ${publicId} eliminada de Cloudinary.`);
     } catch (error) {
       logger.error(`Error al eliminar la imagen ${publicId} de Cloudinary: ${error.message}`);
     }
   }
 };
 
-module.exports = { subirImagenesACloudinary, eliminarImagenesDeCloudinary };
+module.exports = {
+  subirImagenesACloudinary,
+  eliminarImagenesDeCloudinary
+};

@@ -1,26 +1,29 @@
 const axios = require('axios');
-require('dotenv').config();
 const logger = require('../utils/logger');
+require('dotenv').config();
 
-const actualizarPropiedadConImagenes = async (propertyId, imageUrls) => {
+const easyBrokerApi = axios.create({
+  baseURL: 'https://api.easybroker.com/v1',
+  headers: {
+    'X-Authorization': process.env.EASYBROKER_API_KEY,
+  },
+});
+
+const actualizarPropiedadConImagenes = async (propertyId, urlsImagenes) => {
   try {
-    const images = imageUrls.map((url, index) => ({
-      title: `Imagen ${index + 1}`,
+    logger.info(`Actualizando la propiedad ${propertyId} con ${urlsImagenes.length} imágenes...`);
+    
+    const images = urlsImagenes.map(url => ({
+      title: 'Property Image',
       url,
     }));
 
-    const response = await axios.patch(`https://api.easybroker.com/v1/properties/${propertyId}`, {
-      images: images,
-    }, {
-      headers: {
-        'X-Authorization': process.env.EASYBROKER_API_KEY,
-      }
-    });
+    const response = await easyBrokerApi.patch(`/properties/${propertyId}`, { images });
 
     if (response.status === 200) {
-      logger.success(`🎉 Propiedad ${propertyId} actualizada correctamente.`);
+      logger.success(`Propiedad ${propertyId} actualizada correctamente en EasyBroker.`);
     } else {
-      logger.error(`Error al actualizar la propiedad ${propertyId}: ${response.statusText}`);
+      logger.error(`Error al actualizar la propiedad: ${response.statusText}`);
     }
 
     return response.data;
