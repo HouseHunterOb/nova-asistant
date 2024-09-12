@@ -136,9 +136,20 @@ async function manejarSubidaImagenes() {
       await actualizarPropiedadConImagenes(propertyId, urlsCloudinary);
       logger.success('🎉 ¡Imágenes subidas con éxito a Cloudinary y EasyBroker!');
 
-      // Eliminar las imágenes de Cloudinary después de la subida exitosa a EasyBroker
-      await eliminarImagenesDeCloudinary(publicIds);
-      logger.success('🧹 ¡Imágenes eliminadas de Cloudinary después de la subida exitosa!');
+      // Preguntar si se desea eliminar las imágenes de Cloudinary
+      const deleteCloudinaryPrompt = new Confirm({
+        name: 'deleteCloudinary',
+        message: '¿Quieres eliminar las imágenes de Cloudinary ahora que han sido subidas a EasyBroker?',
+      });
+
+      const deleteCloudinary = await deleteCloudinaryPrompt.run();
+
+      if (deleteCloudinary) {
+        await eliminarImagenesDeCloudinary(publicIds);
+        logger.success('🧹 ¡Imágenes eliminadas de Cloudinary después de la subida exitosa!');
+      } else {
+        logger.info('🚫 Las imágenes no fueron eliminadas de Cloudinary.');
+      }
     } else {
       logger.error('⚠️ No se subieron imágenes a Cloudinary.');
     }
