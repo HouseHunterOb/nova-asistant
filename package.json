@@ -12,6 +12,8 @@
   "dependencies": {
     "aws-sdk": "^2.1687.0",
     "axios": "^1.7.7",
+    "chalk": "^5.3.0",
+    "cloudinary": "^2.4.0",
     "dotenv": "^16.4.5",
     "enquirer": "^2.4.1",
     "inquirer": "^10.1.8",
